@@ -12,7 +12,7 @@ namespace Mapbox.Editor
         public static void Sync()
         {
             var path = Application.dataPath;
-            path = path.Replace("sdkproject" + Path.DirectorySeparatorChar + "Assets", "");
+            path = path.Replace(Path.Combine("sdkproject", "Assets"), "");
             var executableExenstion = Application.platform == RuntimePlatform.WindowsEditor ? ".bat" : ".sh";
 
             var exe = new Process();
