@@ -31,7 +31,6 @@ namespace Mapbox.Unity.Utilities
             }
 #endif
             Runnable.Run(DoRequest());
-            throw new Exception(url);
         }
 
         public void Cancel()
