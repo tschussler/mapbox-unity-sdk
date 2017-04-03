@@ -24,7 +24,6 @@ namespace Mapbox.Unity.Utilities
         {
             _request = UnityWebRequest.Get(url);
             _callback = callback;
-
 #if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
             {
@@ -32,6 +31,7 @@ namespace Mapbox.Unity.Utilities
             }
 #endif
             Runnable.Run(DoRequest());
+            throw new Exception(url);
         }
 
         public void Cancel()
