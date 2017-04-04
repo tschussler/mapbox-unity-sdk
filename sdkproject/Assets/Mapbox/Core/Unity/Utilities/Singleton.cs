@@ -62,8 +62,8 @@ namespace Mapbox.Unity.Utilities
                 if (singletonObject == null)
                     singletonObject = new GameObject(singletonName);
 #if SINGLETONS_VISIBLE
-                singletonObject.hideFlags = HideFlags.DontSave;
-                //singletonObject.hideFlags = HideFlags.None;
+                //singletonObject.hideFlags = HideFlags.DontSave;
+                singletonObject.hideFlags = HideFlags.None;
 #else
                 singletonObject.hideFlags = HideFlags.HideAndDontSave;
 #endif
