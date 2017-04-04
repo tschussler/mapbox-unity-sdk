@@ -80,11 +80,15 @@ namespace Mapbox.Examples.Playground
             _map.Zoom = (int)_zoomSlider.value;
             _map.Subscribe(this);
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(10f);
             var gos = FindObjectsOfType<Runnable>();
+            var log = "";
             foreach (var go in gos)
             {
-                Debug.Log("RasterTileExample: " + go.name);            }
+                log += go.name + "--";
+            }
+
+            throw new Exception(log);
         }
 
         /// <summary>

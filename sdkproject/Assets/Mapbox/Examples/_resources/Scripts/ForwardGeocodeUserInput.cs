@@ -61,6 +61,14 @@ namespace Mapbox.Examples
 
         void HandleGeocoderResponse(ForwardGeocodeResponse res)
         {
+            if (res == null)
+            {
+                throw new Exception("Response is null!");            }
+            if (res.Features.Count < 1)
+            {
+                throw new Exception("No features available!");
+            }
+            Debug.Log("ForwardGeocodeUserInput: " + res.Query[0]);
             _hasResponse = true;
             _coordinate = res.Features[0].Center;
             Response = res;
