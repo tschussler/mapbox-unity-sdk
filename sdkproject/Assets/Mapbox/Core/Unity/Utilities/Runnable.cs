@@ -16,13 +16,14 @@
 */
 
 // Uncomment to enable debugging of the Runnable class.
-//#define ENABLE_RUNNABLE_DEBUGGING
+#define ENABLE_RUNNABLE_DEBUGGING
 
 namespace Mapbox.Unity.Utilities
 {
     using UnityEngine;
     using System.Collections;
     using System.Collections.Generic;
+    using System;
 
     /// <summary>
     /// Helper class for running co-routines without having to inherit from MonoBehavior.
@@ -67,6 +68,11 @@ namespace Mapbox.Unity.Utilities
         static public bool IsRunning(int id)
         {
             return Instance.m_Routines.ContainsKey(id);
+        }
+
+        void OnDestroy()
+        {
+            throw new Exception("I'M DEAD!");
         }
 
 #if UNITY_EDITOR

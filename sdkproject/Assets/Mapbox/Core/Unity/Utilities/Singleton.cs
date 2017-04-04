@@ -15,7 +15,7 @@
 *
 */
 
-//#define SINGLETONS_VISIBLE
+#define SINGLETONS_VISIBLE
 
 namespace Mapbox.Unity.Utilities
 {
@@ -63,6 +63,7 @@ namespace Mapbox.Unity.Utilities
                     singletonObject = new GameObject(singletonName);
 #if SINGLETONS_VISIBLE
                 singletonObject.hideFlags = HideFlags.DontSave;
+                //singletonObject.hideFlags = HideFlags.None;
 #else
                 singletonObject.hideFlags = HideFlags.HideAndDontSave;
 #endif

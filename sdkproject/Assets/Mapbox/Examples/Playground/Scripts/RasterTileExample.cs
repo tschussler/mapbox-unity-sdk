@@ -3,6 +3,7 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+using System.Collections.Generic;
 
 namespace Mapbox.Examples.Playground
 {
@@ -14,6 +15,7 @@ namespace Mapbox.Examples.Playground
     using UnityEngine.UI;
     using Mapbox.Utils;
     using Mapbox.Unity.Utilities;
+    using System.Collections;
 
     public class RasterTileExample : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile>
     {
@@ -70,13 +72,19 @@ namespace Mapbox.Examples.Playground
             }
         }
 
-        void Start()
+        IEnumerator Start()
         {
             _map = new Map<RasterTile>(MapboxAccess.Instance);
             _map.MapId = _mapboxStyles[_mapstyle];
             _map.Center = _startLoc;
             _map.Zoom = (int)_zoomSlider.value;
             _map.Subscribe(this);
+
+            yield return new WaitForSeconds(1f);
+            var gos = FindObjectsOfType<Runnable>();
+            foreach (var go in gos)
+            {
+                Debug.Log("RasterTileExample: " + go.name);            }
         }
 
         /// <summary>
