@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Name: BuildingVisualizer
   m_EditorClassIdentifier: 
   Active: 1
-  SmoothMeshes: 0
   _classificationKey: 
-  _key: building
+  _key: freeway-bpm7zy
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 70166653a5881394c9dc697c1014376e, type: 2}
   Stacks: []

@@ -109,6 +109,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
                 foreach (var layerName in vectorTile.Data.LayerNames())
                 {
+                    Debug.Log("MeshFactory: " + layerName);
                     if (_layerBuilder.ContainsKey(layerName))
                     {
                         foreach (var builder in _layerBuilder[layerName])

@@ -11,5 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: MapImageFactory
   m_EditorClassIdentifier: 
-  Active: 1
-  _mapId: mapbox.satellite
+  _mapIdType: 1
+  _customMapId: fa7c0n.df8qddtp
+  _mapId: fa7c0n.df8qddtp
+  _baseMaterial: {fileID: 0}
