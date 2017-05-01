@@ -13,6 +13,7 @@ namespace Mapbox.Unity.Utilities
 
 #if UNITY_EDITOR
     using UnityEditor;
+    using UnityEngine;
 #endif
 
     internal sealed class HTTPRequest : IAsyncRequest
@@ -22,6 +23,7 @@ namespace Mapbox.Unity.Utilities
 
         public HTTPRequest(string url, Action<Response> callback)
         {
+            Debug.Log("HTTPRequest: " + url);
             _request = UnityWebRequest.Get(url);
             _callback = callback;
 

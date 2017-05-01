@@ -38,6 +38,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         private string _classificationKey;
         [SerializeField]
         private string _key;
+
+        [SerializeField]
+        bool _forceSidewalk;
+
         public override string Key
         {
             get { return _key; }
@@ -74,6 +78,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             {
                 filterOut = false;
                 var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
+                if (!feature.Properties.ContainsKey("footway") && _forceSidewalk)
+                {
+                    continue;
+                }
                 foreach (var filter in Filters)
                 {
                     if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
