@@ -50,7 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         [SerializeField]
         private ModifierStackBase _defaultStack;
         [SerializeField]
-        private List<TypeVisualizerTuple> Stacks;
+        public List<ModifierStackBase> Stacks;
 
         private GameObject _container;
 
@@ -73,9 +73,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
                 foreach (var filter in Filters)
                 {
-                    if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
-                        continue;
-
                     if (!filter.Try(feature))
                     {
                         filterOut = true;
@@ -95,7 +92,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
             for (int i = 0; i < Stacks.Count; i++)
             {
-                mergedStack = Stacks[i].Stack as MergedModifierStack;
+                mergedStack = Stacks[i] as MergedModifierStack;
                 if (mergedStack != null)
                 {
                     mergedStack.End(tile, _container);
@@ -122,27 +119,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
                 if (geometry.Count <= 1)
                     continue;
-
-                //this will be improved in next version and will probably be replaced by filters
-                string styleSelectorKey = "";
-                if (string.IsNullOrEmpty(_classificationKey))
-                {
-                    if (feature.Properties.ContainsKey("type"))
-                    {
-                        styleSelectorKey = feature.Properties["type"].ToString().ToLowerInvariant();
-                    }
-                    else if (feature.Properties.ContainsKey("class"))
-                    {
-                        styleSelectorKey = feature.Properties["class"].ToString().ToLowerInvariant();
-                    }
-                }
-                else if (feature.Properties.ContainsKey(_classificationKey))
-                {
-                    if (feature.Properties.ContainsKey(_classificationKey))
-                    {
-                        styleSelectorKey = feature.Properties[_classificationKey].ToString().ToLowerInvariant();
-                    }
-                }
 
                 //we'll run all visualizers on MeshData here 
                 var list = geometry;
@@ -191,19 +167,24 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                     return vertex;
                 }).ToList();
 
-                //and finally, running the modifier stack on the feature
-                var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
-                GameObject go;
-                if (mod != null)
+                var processed = false;
+                GameObject go = null;
+                foreach (var stack in Stacks)
                 {
-                    go = mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
+                    if(stack.Filter.Try(feature))
+                    {
+                        go = stack.Execute(tile, feature, meshData, parent);
+                        processed = true;
+                        break;
+                    }
                 }
-                else
+
+                if(!processed)
                 {
-                    if (_defaultStack != null)
-                        go = _defaultStack.Execute(tile, feature, meshData, parent, _key);
+                    go = _defaultStack.Execute(tile, feature, meshData, parent);
                 }
-                //go.layer = LayerMask.NameToLayer(_key);
+
+                go.layer = LayerMask.NameToLayer(_key);
             }
         }
     }
