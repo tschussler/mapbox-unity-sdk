@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
   m_Name: StyledDefaultRoadStack
   m_EditorClassIdentifier: 
+  Filter: {fileID: 11400000, guid: d97b59ed0990e20449137b06cd5683f5, type: 2}
   MeshModifiers:
   - {fileID: 11400000, guid: c87de0ad57b91c445b1e831ddef883e2, type: 2}
   - {fileID: 11400000, guid: b5d1e51a365f45143868582439a079ce, type: 2}

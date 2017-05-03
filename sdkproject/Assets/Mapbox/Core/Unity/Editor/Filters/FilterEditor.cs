@@ -7,13 +7,12 @@ using UnityEditor.PostProcessing;
 using System.Linq.Expressions;
 using System;
 
-public class FilterEditor : Editor
+public class FilterEditor
 {
     public FilterBase target { get; internal set; }
-    public SerializedProperty serializedProperty { get; internal set; }
+    public SerializedObject serializedObject { get; internal set; }
 
     protected SerializedProperty m_SettingsProperty;
-    protected SerializedProperty m_EnabledProperty;
 
     internal bool alwaysEnabled = false;
     //internal PostProcessingProfile profile;
@@ -21,8 +20,7 @@ public class FilterEditor : Editor
 
     internal void OnPreEnable()
     {
-        m_SettingsProperty = serializedProperty.FindPropertyRelative("m_Settings");
-        m_EnabledProperty = serializedProperty.FindPropertyRelative("m_Enabled");
+        m_SettingsProperty = serializedObject.FindProperty("m_Settings");
 
         OnEnable();
     }
@@ -41,20 +39,14 @@ public class FilterEditor : Editor
         //    ? EditorGUIHelper.Header(serializedProperty.displayName, m_SettingsProperty)
         //    : EditorGUIHelper.Header(serializedProperty.displayName, m_SettingsProperty, m_EnabledProperty, Reset);
 
-        if (true)
-        {
-            EditorGUI.indentLevel++;
-            using (new EditorGUI.DisabledGroupScope(!m_EnabledProperty.boolValue))
-            {
-                OnInspectorGUI();
-            }
-            EditorGUI.indentLevel--;
-        }
+        EditorGUI.indentLevel++;
+        OnInspectorGUI();
+        EditorGUI.indentLevel--;
     }
 
     void Reset()
     {
-        var obj = serializedProperty.serializedObject;
+        var obj = serializedObject;
         Undo.RecordObject(obj.targetObject, "Reset");
         target.Reset();
         EditorUtility.SetDirty(obj.targetObject);

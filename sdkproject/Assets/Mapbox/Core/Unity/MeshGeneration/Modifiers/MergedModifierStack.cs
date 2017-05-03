@@ -18,9 +18,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Merged Modifier Stack")]
     public class MergedModifierStack : ModifierStackBase
     {
-        public List<MeshModifier> MeshModifiers;
-        public List<GameObjectModifier> GoModifiers;
-
         private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
         private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
         private Dictionary<UnityTile, int> _buildingCount = new Dictionary<UnityTile, int>();

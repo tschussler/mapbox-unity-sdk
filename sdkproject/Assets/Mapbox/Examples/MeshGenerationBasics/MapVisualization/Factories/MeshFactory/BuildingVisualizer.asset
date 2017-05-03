@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Name: BuildingVisualizer
   m_EditorClassIdentifier: 
   Active: 1
-  SmoothMeshes: 0
   _classificationKey: 
   _key: building
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 70166653a5881394c9dc697c1014376e, type: 2}
-  Stacks: []
+  Stacks:
+  - {fileID: 11400000, guid: 3f6195a9cbd227648922e0f557d09a8a, type: 2}
+  - {fileID: 11400000, guid: 91dd0877068af574ea9ca88e7e69e649, type: 2}
+  - {fileID: 11400000, guid: 3ee7c0e9d7cf101428bfa61af1adae86, type: 2}

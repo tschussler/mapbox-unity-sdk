@@ -13,8 +13,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
     public class ModifierStack : ModifierStackBase
     {
-        public List<MeshModifier> MeshModifiers;
-        public List<GameObjectModifier> GoModifiers;
+        
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {

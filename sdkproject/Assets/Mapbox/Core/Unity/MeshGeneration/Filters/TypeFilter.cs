@@ -4,6 +4,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
     using Mapbox.Unity.MeshGeneration.Data;
     using System;
 
+    [Serializable]
     [CreateAssetMenu(menuName = "Mapbox/Filters/Type Filter")]
     public class TypeFilter : FilterBase
     {

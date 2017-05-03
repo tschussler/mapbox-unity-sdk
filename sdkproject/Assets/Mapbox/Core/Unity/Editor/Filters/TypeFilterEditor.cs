@@ -24,11 +24,5 @@ public class TypeFilterEditor : FilterEditor
         EditorGUILayout.PropertyField(_key);
         EditorGUILayout.PropertyField(_type);
         EditorGUILayout.PropertyField(_behaviour);
-        //EditorGUILayout.PropertyField(m_Downsampling);
-        //EditorGUILayout.PropertyField(m_ForceForwardCompatibility);
-        //EditorGUILayout.PropertyField(m_HighPrecision, EditorGUIHelper.GetContent("High Precision (Forward)"));
-
-        //using (new EditorGUI.DisabledGroupScope(m_ForceForwardCompatibility.boolValue))
-        //    EditorGUILayout.PropertyField(m_AmbientOnly, EditorGUIHelper.GetContent("Ambient Only (Deferred + HDR)"));
     }
 }
