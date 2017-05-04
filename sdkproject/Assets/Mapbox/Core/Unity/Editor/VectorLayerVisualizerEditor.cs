@@ -79,6 +79,8 @@ public class VectorLayerVisualizerEditor : Editor
                         if (!_stackObj.ContainsKey(ele.GetHashCode()))
                             _stackObj.Add(ele.GetHashCode(), new SerializedObject(ele));
 
+                        EditorGUILayout.LabelField("Filter");
+                        EditorGUI.indentLevel += 2;
                         _visualizer.Stacks[i].Filter = (FilterBase)EditorGUILayout.ObjectField(_visualizer.Stacks[i].Filter, typeof(FilterBase));
                         if (_visualizer.Stacks[i].Filter != null)
                         {
@@ -90,27 +92,28 @@ public class VectorLayerVisualizerEditor : Editor
                             EditorUtility.SetDirty(ele);
                             _stackObj[ele.GetHashCode()].ApplyModifiedProperties();
                         }
+                        EditorGUI.indentLevel -= 2;
                     }
 
-
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Modifier Stack");
+                    EditorGUI.indentLevel += 2;
                     _visualizer.Stacks[i] = (ModifierStackBase)EditorGUILayout.ObjectField(_visualizer.Stacks[i], typeof(ModifierStackBase));
 
                     if (ele != null)
                     {
-                        EditorGUI.indentLevel += 2;
                         foreach (var item in ele.MeshModifiers)
                         {
                             EditorGUILayout.LabelField(item.name);
                         }
-                        EditorGUI.indentLevel -= 2;
                     }
-
+                    EditorGUI.indentLevel -= 2;
                     EditorGUI.indentLevel -= 2;
                 }
             }
         }
 
-
+        EditorGUILayout.Space();
         if (GUILayout.Button("Add New Visualizer"))
         {
             _visualizer.Stacks.Add(null);
@@ -122,7 +125,6 @@ public class VectorLayerVisualizerEditor : Editor
 
     private void DrawEditorFor(int index, FilterBase filter)
     {
-        EditorGUI.indentLevel += 2;
         var editorType = _filterEditorDict[filter.GetType()];
         int hash = filter.GetHashCode();
         if (!_filterEditors.ContainsKey(hash))
@@ -139,7 +141,6 @@ public class VectorLayerVisualizerEditor : Editor
             EditorUtility.SetDirty(filter);
             _filterEditors[hash].serializedObject.ApplyModifiedProperties();
         }
-        EditorGUI.indentLevel -= 2;
     }
 
 
