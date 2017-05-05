@@ -9,9 +9,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
     public abstract class ModifierStackBase : ScriptableObject
     {
-        [SerializeField]
-        public FilterBase Filter;
-
         public List<MeshModifier> MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 

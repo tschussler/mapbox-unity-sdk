@@ -11,9 +11,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     using Mapbox.Unity.Utilities;
 
     [Serializable]
-    public class TypeVisualizerTuple
+    public class FilterStackTuple
     {
-        public string Type;
+        public FilterBase Filter;
         public ModifierStackBase Stack;
     }
 
@@ -45,12 +45,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         }
 
         [SerializeField]
-        private List<FilterBase> Filters;
+        public List<FilterBase> Filters;
 
         [SerializeField]
-        private ModifierStackBase _defaultStack;
-        [SerializeField]
-        public List<ModifierStackBase> Stacks;
+        public List<FilterStackTuple> Stacks;
 
         private GameObject _container;
 
@@ -84,15 +82,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                     Build(feature, tile, _container);
             }
 
-            var mergedStack = _defaultStack as MergedModifierStack;
-            if (mergedStack != null)
-            {
-                mergedStack.End(tile, _container);
-            }
-
+            MergedModifierStack mergedStack = null;
             for (int i = 0; i < Stacks.Count; i++)
             {
-                mergedStack = Stacks[i] as MergedModifierStack;
+                mergedStack = Stacks[i].Stack as MergedModifierStack;
                 if (mergedStack != null)
                 {
                     mergedStack.End(tile, _container);
@@ -169,22 +162,21 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
                 var processed = false;
                 GameObject go = null;
-                foreach (var stack in Stacks)
+                foreach (var entry in Stacks)
                 {
-                    if(stack.Filter.Try(feature))
+                    if(entry.Filter == null)
                     {
-                        go = stack.Execute(tile, feature, meshData, parent);
+                        processed = true;
+                    }
+                    else if(entry.Filter.Try(feature))
+                    {
+                        go = entry.Stack.Execute(tile, feature, meshData, parent);
                         processed = true;
                         break;
                     }
                 }
 
-                if(!processed)
-                {
-                    go = _defaultStack.Execute(tile, feature, meshData, parent);
-                }
-
-                go.layer = LayerMask.NameToLayer(_key);
+                //go.layer = LayerMask.NameToLayer(_key);
             }
         }
     }

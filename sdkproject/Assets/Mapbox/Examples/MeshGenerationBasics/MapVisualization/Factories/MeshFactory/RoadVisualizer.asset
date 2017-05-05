@@ -15,8 +15,10 @@ MonoBehaviour:
   _classificationKey: 
   _key: road
   Filters: []
-  _defaultStack: {fileID: 11400000, guid: 3f6195a9cbd227648922e0f557d09a8a, type: 2}
   Stacks:
-  - {fileID: 11400000, guid: 5915928cb8624134a87d7604161e28ae, type: 2}
-  - {fileID: 11400000, guid: a60e54547b616da4f96ccbe69f36383e, type: 2}
-  - {fileID: 11400000, guid: 22f3cf4991004ed4fbed30b560a9e99f, type: 2}
+  - Filter: {fileID: 0}
+    Stack: {fileID: 0}
+  - Filter: {fileID: 0}
+    Stack: {fileID: 0}
+  - Filter: {fileID: 0}
+    Stack: {fileID: 0}

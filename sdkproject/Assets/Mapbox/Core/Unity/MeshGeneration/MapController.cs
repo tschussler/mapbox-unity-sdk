@@ -103,7 +103,6 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) / Conversions.GetTileScaleInMeters((float)lat, Zoom);
                     tile.TileCoordinate = new Vector2(i, j);
                     tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
-                    Debug.Log(tile.Rect.Center);
                     tile.transform.position = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
                     tile.transform.SetParent(_root.transform, false);
                     MapVisualization.ShowTile(tile);

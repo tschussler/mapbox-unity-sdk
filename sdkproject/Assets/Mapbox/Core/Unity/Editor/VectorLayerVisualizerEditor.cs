@@ -15,29 +15,20 @@ public class VectorLayerVisualizerEditor : Editor
 {
     private MonoScript script;
     private SerializedProperty _visualizerList;
+    private SerializedProperty _filterList;
+    private SerializedProperty _key;
     private VectorLayerVisualizer _visualizer;
-    List<bool> showPosition;
     string header;
     private Type typ;
     private int hash;
 
-    private Dictionary<Type, Type> _filterEditorDict;
-    private Dictionary<int, FilterEditor> _filterEditors;
-    private Dictionary<int, SerializedObject> _stackObj;
-
-
     void OnEnable()
     {
         script = MonoScript.FromScriptableObject((VectorLayerVisualizer)target);
-        _filterEditors = new Dictionary<int, FilterEditor>();
-        _stackObj = new Dictionary<int, SerializedObject>();
-        _filterEditorDict = new Dictionary<Type, Type>()
-        {
-            {typeof(Mapbox.Unity.MeshGeneration.Filters.TypeFilter), typeof(TypeFilterEditor) }
-        };
         _visualizer = target as VectorLayerVisualizer;
         _visualizerList = serializedObject.FindProperty("Stacks");
-        showPosition = new List<bool>(_visualizer.Stacks.Count);
+        _filterList = serializedObject.FindProperty("Filters");
+        _key = serializedObject.FindProperty("_key");
     }
 
     public override void OnInspectorGUI()
@@ -47,24 +38,68 @@ public class VectorLayerVisualizerEditor : Editor
 
         serializedObject.Update();
 
-        if (showPosition.Count != _visualizer.Stacks.Count)
+        GUI.enabled = false;
+        script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+        GUI.enabled = true;
+        EditorGUILayout.PropertyField(_key, new GUIContent("Layer Name"));
+
+        EditorGUILayout.Space();
+        EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Filters");
+        if (GUILayout.Button("+"))
         {
-            showPosition.Clear();
-            for (int i = 0; i < _visualizer.Stacks.Count; i++)
+            _visualizer.Filters.Add(null);
+        }
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.Space();
+        if (_visualizer.Filters != null)
+        {
+            for (int i = 0; i < _visualizer.Filters.Count; i++)
             {
-                showPosition.Add(false);
+                var ind = i;
+                var filt = _visualizer.Filters[ind];
+                header = filt != null ? filt.name : "Assign a filter";
+                if (Header(header, _filterList.GetArrayElementAtIndex(ind), null, () =>
+                {
+                    _filterList.DeleteArrayElementAtIndex(ind);
+                    _visualizer.Filters.RemoveAt(ind);
+                }))
+                {
+                    EditorGUI.indentLevel++;
+                    if (filt != null)
+                    {
+                        var ed = CreateEditor(filt);
+                        ed.OnInspectorGUI();
+                    }
+                    else
+                    {
+                        _visualizer.Filters[ind] = (FilterBase)EditorGUILayout.ObjectField(_visualizer.Filters[i], typeof(FilterBase));
+                    }
+                    EditorGUI.indentLevel--;
+                }
             }
         }
-
-
+        EditorGUILayout.Space();
+        EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
+        EditorGUILayout.Space();
         if (_visualizerList != null)
         {
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Modifier Stacks");
+            if (GUILayout.Button("+"))
+            {
+                _visualizer.Stacks.Add(null);
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
             for (int i = 0; i < _visualizer.Stacks.Count; i++)
             {
-                header = _visualizer.Stacks[i] != null ? _visualizer.Stacks[i].name : "Assign a modifier stack";
-                var ele = _visualizer.Stacks[i];
-
+                header = (_visualizer.Stacks[i] != null && _visualizer.Stacks[i].Stack != null) ? _visualizer.Stacks[i].Stack.name : "Assign a modifier stack";
+                var ele = _visualizer.Stacks[i].Stack;
+                
                 var ind = i;
                 if (Header(header, _visualizerList.GetArrayElementAtIndex(i), null, () =>
                 {
@@ -72,84 +107,60 @@ public class VectorLayerVisualizerEditor : Editor
                     _visualizer.Stacks.RemoveAt(ind);
                 }))
                 {
-                    EditorGUI.indentLevel += 2;
-                    
+                    EditorGUI.indentLevel++;
                     if (ele != null)
                     {
-                        if (!_stackObj.ContainsKey(ele.GetHashCode()))
-                            _stackObj.Add(ele.GetHashCode(), new SerializedObject(ele));
-
-                        EditorGUILayout.LabelField("Filter");
-                        EditorGUI.indentLevel += 2;
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("Filter", GUILayout.Width(40));
                         _visualizer.Stacks[i].Filter = (FilterBase)EditorGUILayout.ObjectField(_visualizer.Stacks[i].Filter, typeof(FilterBase));
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUI.indentLevel ++;
                         if (_visualizer.Stacks[i].Filter != null)
                         {
                             var filterType = _visualizer.Stacks[i].Filter.GetType();
-                            if (_filterEditorDict.ContainsKey(filterType))
-                            {
-                                DrawEditorFor(i, _visualizer.Stacks[i].Filter);
-                            }
+                            EditorGUILayout.Space();
+                            var ed = CreateEditor(_visualizer.Stacks[i].Filter);
+                            ed.OnInspectorGUI();
                             EditorUtility.SetDirty(ele);
-                            _stackObj[ele.GetHashCode()].ApplyModifiedProperties();
+
+                            if (GUILayout.Button("Remove Filter"))
+                            {
+                                _visualizer.Stacks[i].Filter = null;
+                            }
+
                         }
-                        EditorGUI.indentLevel -= 2;
+                        EditorGUI.indentLevel --;
                     }
 
                     EditorGUILayout.Space();
-                    EditorGUILayout.LabelField("Modifier Stack");
-                    EditorGUI.indentLevel += 2;
-                    _visualizer.Stacks[i] = (ModifierStackBase)EditorGUILayout.ObjectField(_visualizer.Stacks[i], typeof(ModifierStackBase));
-
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Stack", GUILayout.Width(40));
+                    _visualizer.Stacks[i].Stack = (ModifierStackBase)EditorGUILayout.ObjectField(_visualizer.Stacks[i].Stack, typeof(ModifierStackBase));
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUI.indentLevel++;
                     if (ele != null)
                     {
-                        foreach (var item in ele.MeshModifiers)
-                        {
-                            EditorGUILayout.LabelField(item.name);
-                        }
+                        EditorGUILayout.Space();
+                        var editor = CreateEditor(ele);
+                        editor.OnInspectorGUI();
                     }
-                    EditorGUI.indentLevel -= 2;
-                    EditorGUI.indentLevel -= 2;
+                    EditorGUI.indentLevel--;
+                    EditorGUI.indentLevel--;
                 }
             }
         }
 
         EditorGUILayout.Space();
-        if (GUILayout.Button("Add New Visualizer"))
-        {
-            _visualizer.Stacks.Add(null);
-            showPosition.Add(false);
-        }
+        
         EditorUtility.SetDirty(_visualizer);
         serializedObject.ApplyModifiedProperties();
     }
 
-    private void DrawEditorFor(int index, FilterBase filter)
-    {
-        var editorType = _filterEditorDict[filter.GetType()];
-        int hash = filter.GetHashCode();
-        if (!_filterEditors.ContainsKey(hash))
-        {
-            var editIns = (TypeFilterEditor)Activator.CreateInstance(editorType);
-            editIns.target = filter;
-            _filterEditors.Add(filter.GetHashCode(), editIns);
-            editIns.serializedObject = new SerializedObject(filter);
-            editIns.OnPreEnable();
-        }
-        else
-        {
-            _filterEditors[hash].OnInspectorGUI();
-            EditorUtility.SetDirty(filter);
-            _filterEditors[hash].serializedObject.ApplyModifiedProperties();
-        }
-    }
-
-
     public bool Header(string title, SerializedProperty group, SerializedProperty enabledField, Action resetAction)
     {
-        //var field = ReflectionUtils.GetFieldInfoFromPath(enabledField.serializedObject.targetObject, enabledField.propertyPath);
         object parent = null;
         PropertyInfo prop = null;
-        
+
         var display = group == null || group.isExpanded;
 
         var rect = GUILayoutUtility.GetRect(16f, 22f, FxStyles.header);

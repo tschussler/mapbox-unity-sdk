@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: SchoolFilter
   m_EditorClassIdentifier: 
   m_Settings:
-    Key: type
-    Type: a
-    Behaviour: 1
+    PropertyName: type
+    Value: school
+    Behaviour: 0
