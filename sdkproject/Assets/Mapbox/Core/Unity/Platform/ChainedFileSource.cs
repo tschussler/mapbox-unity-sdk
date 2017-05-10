@@ -2,6 +2,7 @@
 namespace Mapbox.Core.Unity.Platform
 {
 	using System;
+	using System.Collections.Generic;
 	using Mapbox.Platform;
 	using UnityEngine;
 
@@ -24,27 +25,24 @@ namespace Mapbox.Core.Unity.Platform
 			}
 		}
 
-		MemoryCacheAsyncRequestHandler _cachedMemoryHandler;
-		public MemoryCacheAsyncRequestHandler CachedMemoryHandler
-		{
-			get
-			{
-				return _cachedMemoryHandler;
-			}
-		}
+		IAsyncRequestHandler _requestHandler;
 
 		ChainedFileSource()
 		{
-			_cachedMemoryHandler = new MemoryCacheAsyncRequestHandler();
-			var webHandler = new UnityWebRequestAsyncHandler();
-			webHandler.PreviousHandler = _cachedMemoryHandler;
-			
-			_cachedMemoryHandler.NextHandler = webHandler;
+			// Build the links.
+			var memoryCachingAsyncRequestHandler = new MemoryCachingAsyncRequestHandler(100);
+			var webHandler = new UnityCachingWebRequestAsyncHandler(new List<IResponseCachingStrategy> { memoryCachingAsyncRequestHandler });
+
+			// Chain them together.
+			memoryCachingAsyncRequestHandler.NextHandler = webHandler;
+
+			// Set the starting link.
+			_requestHandler = memoryCachingAsyncRequestHandler;
 		}
 
 		public IAsyncRequest Request(string uri, Action<Response> callback, int timeout = 10)
 		{
-			return _cachedMemoryHandler.Request(uri, callback, timeout);
+			return _requestHandler.Request(uri, callback, timeout);
 		}
 	}
 }
