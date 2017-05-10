@@ -1,3 +1,4 @@
+using Mapbox.Core.Unity.Platform;
 namespace Mapbox.Unity.MeshGeneration
 {
     using UnityEngine;
@@ -35,7 +36,7 @@ namespace Mapbox.Unity.MeshGeneration
         /// </summary>
         public void Awake()
         {
-            MapVisualization.Initialize(MapboxAccess.Instance);
+			MapVisualization.Initialize(ChainedFileSource.Instance);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 

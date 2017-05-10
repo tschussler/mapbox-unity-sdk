@@ -89,28 +89,28 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                     rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
                 }
 
-                rasterTile.Initialize(parameters, (Action)(() =>
-                {
-                    if (rasterTile.HasError)
-                    {
-                        tile.ImageDataState = TilePropertyState.Error;
-                        return;
-                    }
+                rasterTile.Initialize(parameters, () =>
+				{
+					if (rasterTile.HasError)
+					{
+						tile.ImageDataState = TilePropertyState.Error;
+						return;
+					}
 
-                    var rend = tile.GetComponent<MeshRenderer>();
-                    rend.material = _baseMaterial;
-                    tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
-                    tile.ImageData.wrapMode = TextureWrapMode.Clamp;
-                    tile.ImageData.LoadImage(rasterTile.Data);
-                    if (_useCompression)
-                    {
-                        // High quality = true seems to decrease image quality?
-                        tile.ImageData.Compress(false);
-                    }
-                    rend.material.mainTexture = tile.ImageData;
-                    tile.ImageDataState = TilePropertyState.Loaded;
+					var rend = tile.GetComponent<MeshRenderer>();
+					rend.material = _baseMaterial;
+					tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
+					tile.ImageData.wrapMode = TextureWrapMode.Clamp;
+					tile.ImageData.LoadImage(rasterTile.Data);
+					if (_useCompression)
+					{
+						// High quality = true seems to decrease image quality?
+						tile.ImageData.Compress(false);
+					}
+					rend.material.mainTexture = tile.ImageData;
+					tile.ImageDataState = TilePropertyState.Loaded;
 
-                }));
+				});
             }
             else
             {

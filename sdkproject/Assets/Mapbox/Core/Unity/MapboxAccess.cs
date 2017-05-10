@@ -1,3 +1,4 @@
+using Mapbox.Core.Unity.Platform;
 namespace Mapbox.Unity {
 	using UnityEngine;
 	using System.IO;
@@ -12,8 +13,8 @@ namespace Mapbox.Unity {
 	/// Object for retrieving an API token and making http requests.
 	/// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
 	/// </summary>
-	public class MapboxAccess : IFileSource {
-
+	public class MapboxAccess 
+	{
 		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
 		static MapboxAccess _instance = new MapboxAccess();
@@ -43,7 +44,7 @@ namespace Mapbox.Unity {
 			get {
 				return _accessToken;
 			}
-			set {
+			private set {
 				if (string.IsNullOrEmpty(value)) {
 					throw new InvalidTokenException("Please configure your access token in the menu!");
 				}
@@ -93,6 +94,7 @@ namespace Mapbox.Unity {
 			return request.text;
 		}
 
+		// TODO: delegate to factory
 
 		/// <summary>
 		/// Makes an asynchronous url query.
@@ -127,7 +129,7 @@ namespace Mapbox.Unity {
 		public Geocoder Geocoder {
 			get {
 				if (_geocoder == null) {
-					_geocoder = new Geocoder(this);
+					_geocoder = new Geocoder(ChainedFileSource.Instance);
 				}
 				return _geocoder;
 			}
@@ -141,7 +143,7 @@ namespace Mapbox.Unity {
 		public Directions Directions {
 			get {
 				if (_directions == null) {
-					_directions = new Directions(this);
+					_directions = new Directions(ChainedFileSource.Instance);
 				}
 				return _directions;
 			}

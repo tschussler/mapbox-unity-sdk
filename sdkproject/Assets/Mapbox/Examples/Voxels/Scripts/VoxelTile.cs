@@ -1,3 +1,4 @@
+using Mapbox.Core.Unity.Platform;
 namespace Mapbox.Examples.Voxels {
 	using Mapbox.Map;
 	using Mapbox.Unity;
@@ -62,7 +63,7 @@ namespace Mapbox.Examples.Voxels {
 		}
 
 		void Start() {
-			_fileSource = MapboxAccess.Instance;
+			_fileSource = ChainedFileSource.Instance;
 
 			_raster = new Map<RasterTile>(_fileSource);
 			_elevation = new Map<RawPngRasterTile>(_fileSource);

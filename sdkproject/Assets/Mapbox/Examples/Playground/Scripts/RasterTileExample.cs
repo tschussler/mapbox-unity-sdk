@@ -3,12 +3,12 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+using Mapbox.Core.Unity.Platform;
 
 namespace Mapbox.Examples.Playground {
 	using System.Linq;
 	using System;
 	using Mapbox.Map;
-	using Mapbox.Unity;
 	using UnityEngine;
 	using UnityEngine.UI;
 	using Mapbox.Utils;
@@ -33,6 +33,8 @@ namespace Mapbox.Examples.Playground {
 		[SerializeField]
 		string _latLon;
 
+		Texture2D _texture;
+
 		// initialize _mapboxStyles
 		string[] _mapboxStyles = new string[]
 		{
@@ -53,6 +55,7 @@ namespace Mapbox.Examples.Playground {
 			_stylesDropdown.AddOptions(_mapboxStyles.ToList());
 			_stylesDropdown.onValueChanged.AddListener(ToggleDropdownStyles);
 			_zoomSlider.onValueChanged.AddListener(AdjustZoom);
+			_texture = new Texture2D(0, 0);
 
 			var parsed = _latLon.Split(',');
 			_startLoc.x = double.Parse(parsed[0]);
@@ -66,7 +69,7 @@ namespace Mapbox.Examples.Playground {
 		}
 
 		void Start() {
-			_map = new Map<RasterTile>(MapboxAccess.Instance);
+			_map = new Map<RasterTile>(ChainedFileSource.Instance);
 			_map.MapId = _mapboxStyles[_mapstyle];
 			_map.Center = _startLoc;
 			_map.Zoom = (int)_zoomSlider.value;
@@ -112,10 +115,8 @@ namespace Mapbox.Examples.Playground {
 				return;
 			}
 
-			// Can we utility this? Should users have to know source size?
-			var texture = new Texture2D(256, 256);
-			texture.LoadImage(tile.Data);
-			_imageContainer.texture = texture;
+			_texture.LoadImage(tile.Data);
+			_imageContainer.texture = _texture;
 		}
 	}
 }
