@@ -12,6 +12,7 @@
 		{
 			// Build the links.
 			var memoryCachingAsyncRequestHandler = new MemoryCachingAsyncRequestHandler(100);
+			// TODO: implement disk caching handler!
 			var webHandler = new UnityCachingWebRequestAsyncHandler(new List<IResponseCachingStrategy> { memoryCachingAsyncRequestHandler });
 
 			// Chain them together.
