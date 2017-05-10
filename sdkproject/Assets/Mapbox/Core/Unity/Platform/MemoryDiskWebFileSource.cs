@@ -1,33 +1,14 @@
-﻿using Mapbox.Unity.Platform;
-namespace Mapbox.Core.Unity.Platform
+﻿namespace Mapbox.Unity.Platform
 {
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Platform;
-	using UnityEngine;
 
-	// TODO: who owns this? Inject into MapboxAccess?
-
-	// CHANGE this to a filesource factory, no instance, configuration settings from a json file configured through an editor window
-
-	public class ChainedFileSource : IFileSource
+	public class MemoryDiskWebFileSource : IFileSource
 	{
-		static ChainedFileSource _instance = new ChainedFileSource();
-
-		/// <summary>
-		/// The singleton instance.
-		/// </summary>
-		public static ChainedFileSource Instance
-		{
-			get
-			{
-				return _instance;
-			}
-		}
-
 		IAsyncRequestHandler _requestHandler;
 
-		ChainedFileSource()
+		public MemoryDiskWebFileSource()
 		{
 			// Build the links.
 			var memoryCachingAsyncRequestHandler = new MemoryCachingAsyncRequestHandler(100);

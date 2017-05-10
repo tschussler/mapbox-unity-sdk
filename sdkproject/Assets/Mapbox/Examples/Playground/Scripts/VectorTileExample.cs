@@ -3,13 +3,12 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Unity;
-using Mapbox.Core.Unity.Platform;
 
 namespace Mapbox.Examples.Playground {
 	using System;
 	using UnityEngine;
 	using UnityEngine.UI;
+	using Mapbox.Unity;
 	using Mapbox.Map;
 	using Mapbox.Json;
 	using Mapbox.VectorTile.ExtensionMethods;
@@ -35,7 +34,7 @@ namespace Mapbox.Examples.Playground {
 		}
 
 		void Start() {
-			_map = new Map<VectorTile>(ChainedFileSource.Instance);
+			_map = new Map<VectorTile>(MapboxAccess.Instance);
 			_map.Zoom = 18;
 			// This marks us an an observer to map.
 			// We will get each tile in OnNext(VectorTile tile) as they become available.

@@ -3,9 +3,9 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Core.Unity.Platform;
 
-namespace Mapbox.Examples.Playground {
+namespace Mapbox.Examples.Playground
+{
 	using System.Linq;
 	using System;
 	using Mapbox.Map;
@@ -13,8 +13,10 @@ namespace Mapbox.Examples.Playground {
 	using UnityEngine.UI;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity;
 
-	public class RasterTileExample : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile> {
+	public class RasterTileExample : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile>
+	{
 		[SerializeField]
 		ForwardGeocodeUserInput _searchLocation;
 
@@ -49,7 +51,8 @@ namespace Mapbox.Examples.Playground {
 
 		int _mapstyle = 0;
 
-		void Awake() {
+		void Awake()
+		{
 			_searchLocation.OnGeocoderResponse += SearchLocation_OnGeocoderResponse;
 			_stylesDropdown.ClearOptions();
 			_stylesDropdown.AddOptions(_mapboxStyles.ToList());
@@ -62,14 +65,17 @@ namespace Mapbox.Examples.Playground {
 			_startLoc.y = double.Parse(parsed[1]);
 		}
 
-		void OnDestroy() {
-			if (_searchLocation != null) {
+		void OnDestroy()
+		{
+			if (_searchLocation != null)
+			{
 				_searchLocation.OnGeocoderResponse -= SearchLocation_OnGeocoderResponse;
 			}
 		}
 
-		void Start() {
-			_map = new Map<RasterTile>(ChainedFileSource.Instance);
+		void Start()
+		{
+			_map = new Map<RasterTile>(MapboxAccess.Instance);
 			_map.MapId = _mapboxStyles[_mapstyle];
 			_map.Center = _startLoc;
 			_map.Zoom = (int)_zoomSlider.value;
@@ -82,7 +88,8 @@ namespace Mapbox.Examples.Playground {
 		/// </summary>
 		/// <param name="sender">Sender.</param>
 		/// <param name="e">E.</param>
-		void SearchLocation_OnGeocoderResponse(object sender, EventArgs e) {
+		void SearchLocation_OnGeocoderResponse(object sender, EventArgs e)
+		{
 			_map.Center = _searchLocation.Coordinate;
 			_map.Update();
 		}
@@ -91,7 +98,8 @@ namespace Mapbox.Examples.Playground {
 		/// Zoom was modified by the slider, begin a new _map query.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		void AdjustZoom(float value) {
+		void AdjustZoom(float value)
+		{
 			_map.Zoom = (int)_zoomSlider.value;
 			_map.Update();
 		}
@@ -100,7 +108,8 @@ namespace Mapbox.Examples.Playground {
 		/// Style dropdown updated, begin a new _map query.
 		/// </summary>
 		/// <param name="value">If set to <c>true</c> value.</param>
-		void ToggleDropdownStyles(int target) {
+		void ToggleDropdownStyles(int target)
+		{
 			_mapstyle = target;
 			_map.MapId = _mapboxStyles[target];
 			_map.Update();
@@ -110,8 +119,10 @@ namespace Mapbox.Examples.Playground {
 		/// Update the texture with new data.
 		/// </summary>
 		/// <param name="tile">Tile.</param>
-		public void OnNext(RasterTile tile) {
-			if (tile.CurrentState != Tile.State.Loaded || tile.HasError) {
+		public void OnNext(RasterTile tile)
+		{
+			if (tile.CurrentState != Tile.State.Loaded || tile.HasError)
+			{
 				return;
 			}
 

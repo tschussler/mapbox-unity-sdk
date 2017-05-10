@@ -2,7 +2,6 @@
 {
 	using System;
 	using Mapbox.Platform;
-	using UnityEngine;
 	using System.Collections.Generic;
 
 	public class UnityCachingWebRequestAsyncHandler : AbstractCachingAyncRequestHandler
@@ -33,22 +32,16 @@
 				uriBuilder.Query = accessTokenQuery;
 			}
 
-			Debug.Log("MemoryCachingAsyncRequestHandler: " + "LOAD FROM WEB");
 			return new Utilities.HTTPRequest(uriBuilder.ToString(), callback, timeout);
 		}
 		
 		public override bool ShouldCache(string key, Response response)
 		{
-			if (response.HasError)
-			{
-				Debug.Log("UnityCachingWebRequestAsyncHandler: " + response.ExceptionsAsString);
-			}
-			return !response.HasError;
+			return !response.HasError && _cachingStrategies != null;
 		}
 
 		public override void Cache(string key, Response response)
 		{
-			UnityEngine.Debug.Log("UnityCachingWebRequestAsyncHandler: " + "caching web response!");
 			foreach (var cachingStrategy in _cachingStrategies)
 			{
 				if (cachingStrategy.ShouldCache(key, response))

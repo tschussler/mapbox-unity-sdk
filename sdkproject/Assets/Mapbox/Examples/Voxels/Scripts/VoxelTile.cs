@@ -1,4 +1,3 @@
-using Mapbox.Core.Unity.Platform;
 namespace Mapbox.Examples.Voxels {
 	using Mapbox.Map;
 	using Mapbox.Unity;
@@ -10,6 +9,7 @@ namespace Mapbox.Examples.Voxels {
 	using Mapbox.Utils;
 	using Mapbox.Platform;
 	using Mapbox.Unity.Utilities;
+
 	class VoxelTile : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile>, Mapbox.Utils.IObserver<RawPngRasterTile> {
 		[SerializeField]
 		ForwardGeocodeUserInput _geocodeInput;
@@ -63,7 +63,7 @@ namespace Mapbox.Examples.Voxels {
 		}
 
 		void Start() {
-			_fileSource = ChainedFileSource.Instance;
+			_fileSource = MapboxAccess.Instance;
 
 			_raster = new Map<RasterTile>(_fileSource);
 			_elevation = new Map<RawPngRasterTile>(_fileSource);
