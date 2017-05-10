@@ -23,10 +23,7 @@ namespace Mapbox.Unity.Utilities
 
 		private UnityWebRequest _request;
 		private int _timeout;
-		private Action<Response> _callback;
-
-		int _id;
-		bool _didAbort;
+		private readonly Action<Response> _callback;
 
 		public bool IsCompleted { get; private set; }
 
@@ -43,8 +40,7 @@ namespace Mapbox.Unity.Utilities
 				Runnable.EnableRunnableInEditor();
 			}
 #endif
-			_id = Runnable.Run(DoRequest());
-
+			Runnable.Run(DoRequest());
 		}
 
 		public void Cancel()
@@ -52,11 +48,7 @@ namespace Mapbox.Unity.Utilities
 			if (_request != null)
 			{
 				_request.Abort();
-				Runnable.Stop(_id);
 				Debug.Log("HTTPRequest: " + "ABORT: " + _request.url);
-				_didAbort = true;
-				//_request.Dispose();
-				//_request = null;
 			}
 		}
 
@@ -65,15 +57,16 @@ namespace Mapbox.Unity.Utilities
 			_request.Send();
 			while (!_request.isDone)
 			{
-				Debug.Log("HTTPRequest: " + _didAbort);
+				// TODO: implement timeout.
 				yield return 0;
 			}
 
-			if (_didAbort)
-			{
-				Debug.Log("HTTPRequest: " + "DID NOT ABORT PROPERLY: " + _request.url);
-			}
+			// This will occur even if cancelled. 
 			var response = Response.FromWebResponse(this, _request, null);
+			if (_request.isError)
+			{
+				response.AddException(new Exception(_request.error));
+			}
 			_callback(response);
 			_request.Dispose();
 			_request = null;
