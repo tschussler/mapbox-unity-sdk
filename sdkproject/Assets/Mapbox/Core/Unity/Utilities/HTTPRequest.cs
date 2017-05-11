@@ -12,10 +12,10 @@ namespace Mapbox.Unity.Utilities
 	using UnityEngine.Networking;
 	using System.Collections;
 	using Mapbox.Platform;
-	using UnityEditor;
+	using UnityEngine;
 
 #if UNITY_EDITOR
-	using UnityEngine;
+	using UnityEditor;
 #endif
 
 	internal sealed class HTTPRequest : IAsyncRequest
