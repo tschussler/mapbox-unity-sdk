@@ -36,9 +36,16 @@ public class MeshFactoryEditor : FactoryEditor
 
         serializedObject.Update();
 
-        GUI.enabled = false;
-        script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
-        GUI.enabled = true;
+        if (hideFlags == HideFlags.NotEditable)
+        {
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+        }
+        else
+        {
+            GUI.enabled = false;
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+            GUI.enabled = true;
+        }
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));

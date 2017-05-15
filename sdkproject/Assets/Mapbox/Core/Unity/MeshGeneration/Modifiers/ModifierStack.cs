@@ -13,12 +13,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
     public class ModifierStack : ModifierStackBase
     {
-        public List<MeshModifier> MeshModifiers;
+        [Type(typeof(MeshModifier))]
+        public MeshModifierList MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
-            foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
+            foreach (MeshModifier mod in MeshModifiers.List.Where(x => x.Active))
             {
                 mod.Run(feature, meshData, tile);
             }
@@ -59,6 +60,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             go.transform.SetParent(main.transform, false);
 
             return go;
+        }
+
+        [System.Serializable]
+        public class MeshModifierList
+        {
+            public List<MeshModifier> List;
+
+            public MeshModifierList()
+            {
+
+            }
         }
     }
 }

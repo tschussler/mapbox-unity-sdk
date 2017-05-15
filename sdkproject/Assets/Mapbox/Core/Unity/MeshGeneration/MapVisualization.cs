@@ -10,7 +10,9 @@ namespace Mapbox.Unity.MeshGeneration
     [CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
     public class MapVisualization : ScriptableObject
     {
-        public List<Factory> Factories;
+        [SerializeField]
+        [Type(typeof(Factory))]
+        public FactoryList Factories;
 
         /// <summary>
         /// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
@@ -18,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration
         /// <param name="fs"></param>
         public void Initialize(IFileSource fs)
         {
-            foreach (Factory fac in Factories.Where(x => x != null))
+            foreach (Factory fac in Factories.List.Where(x => x != null))
             {
                 fac.Initialize(fs);
             }
@@ -30,10 +32,21 @@ namespace Mapbox.Unity.MeshGeneration
         /// <param name="tile"></param>
         public void ShowTile(UnityTile tile)
         {
-            foreach (var fac in Factories.Where(x => x != null))
+            foreach (var fac in Factories.List.Where(x => x != null))
             {
                 fac.Register(tile);
             }
+        }
+    }
+
+    [System.Serializable]
+    public class FactoryList
+    {
+        public List<Factory> List;
+
+        public FactoryList()
+        {
+
         }
     }
 }

@@ -37,9 +37,16 @@ public class TerrainFactoryEditor : FactoryEditor
     {
         serializedObject.Update();
 
-        GUI.enabled = false;
-        script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
-        GUI.enabled = true;
+        if (hideFlags == HideFlags.NotEditable)
+        {
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+        }
+        else
+        {
+            GUI.enabled = false;
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+            GUI.enabled = true;
+        }
         EditorGUILayout.Space();
         EditorGUILayout.Space();
         EditorGUILayout.PropertyField(state_Prop, new GUIContent("Map Type"));

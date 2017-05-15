@@ -56,9 +56,17 @@ public class MapImageFactoryEditor : FactoryEditor
     {
         serializedObject.Update();
 
-        GUI.enabled = false;
-        script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
-        GUI.enabled = true;
+        if (hideFlags == HideFlags.NotEditable)
+        {
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+        }
+        else
+        {
+            GUI.enabled = false;
+            script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+            GUI.enabled = true;
+        }
+
         EditorGUILayout.Space();
         EditorGUILayout.Space();
         EditorGUILayout.PropertyField(mapIdType_Prop, new GUIContent("Map Type"));
@@ -72,9 +80,16 @@ public class MapImageFactoryEditor : FactoryEditor
                 {
                     _choiceIndex = EditorGUILayout.Popup("Style", _choiceIndex, _basicMapNames);
                     mapId_Prop.stringValue = _basicMapIds[_choiceIndex];
-                    GUI.enabled = false;
-                    EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
-                    GUI.enabled = true;
+                    if (hideFlags == HideFlags.NotEditable)
+                    {
+                        EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+                    }
+                    else
+                    {
+                        GUI.enabled = false;
+                        EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+                        GUI.enabled = true;
+                    }
                     EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
                     break;
                 }
