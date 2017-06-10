@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5c6fccdbfcb895449b5f9ea32eef9e2, type: 3}
+  m_Name: FeatureStyle
+  m_EditorClassIdentifier: 
+  SmoothLineModifier:
+    Active: 1
+    m_Enabled: 0
+    m_Settings:
+      MaxEdgeSectionCount: 40
+      PreferredEdgeSectionLength: 10
+  SnapTerrainModifier:
+    Active: 1
+    m_Enabled: 0
+  PolygonMeshModifier:
+    Active: 1
+    m_Enabled: 0
+  UvModifier:
+    Active: 1
+    m_Enabled: 0
+    m_Settings:
+      UseSatelliteRoof: 0
+  HeightModifier:
+    Active: 1
+    m_Enabled: 0
+    _flatTops: 0
+    _height: 0
+    _forceHeight: 0

@@ -3,8 +3,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using System.Collections.Generic;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
-    public enum ExtrusionType
+	public enum ExtrusionType
     {
         Wall,
         FirstMidFloor,
@@ -16,17 +17,42 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     /// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data. 
     /// Height Modifier also creates a continuous UV mapping for side walls.
     /// </summary>
-    [CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
+    [Serializable]
     public class HeightModifier : MeshModifier
     {
-        [SerializeField]
-        private bool _flatTops;
-        [SerializeField]
-        private float _height;
-        [SerializeField]
-        private bool _forceHeight;
+		[Serializable]
+		public struct ModifierSettings
+		{
+			public bool FlatTops;
+			public float Height;
+			public bool ForceHeight;
 
-        public override ModifierType Type { get { return ModifierType.Preprocess; } }
+			public static ModifierSettings DefaultSettings
+			{
+				get
+				{
+					return new ModifierSettings
+					{
+						FlatTops = true,
+						Height = 0,
+						ForceHeight = false
+					};
+				}
+			}
+		}
+
+		[SerializeField]
+		ModifierSettings m_Settings = ModifierSettings.DefaultSettings;
+		public ModifierSettings Settings
+		{
+			get { return m_Settings; }
+			set { m_Settings = value; }
+		}
+
+		public override void Reset()
+		{
+			m_Settings = ModifierSettings.DefaultSettings;
+		}
 
         public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
@@ -34,8 +60,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 return;
 
             var minHeight = 0f;
-            float hf = _height;
-            if (!_forceHeight)
+            float hf = Settings.Height;
+            if (!Settings.ForceHeight)
             {
                 if (feature.Properties.ContainsKey("height"))
                 {
@@ -58,7 +84,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
             var max = md.Vertices[0].y;
             var min = md.Vertices[0].y;
-            if (_flatTops)
+            if (Settings.FlatTops)
             {
                 for (int i = 0; i < md.Vertices.Count; i++)
                 {

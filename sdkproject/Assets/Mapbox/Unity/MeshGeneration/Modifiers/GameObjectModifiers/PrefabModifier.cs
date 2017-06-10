@@ -17,7 +17,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         {
             int selpos = fb.Data.Points[0].Count / 2;
             var met = fb.Data.Points[0][selpos];
-            var go = Instantiate(_prefab);
+            var go = GameObject.Instantiate(_prefab);
             go.name = fb.Data.Data.Id.ToString();
             go.transform.position = met;
             go.transform.SetParent(fb.transform, false);

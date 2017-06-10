@@ -5,15 +5,42 @@ using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-    [CreateAssetMenu(menuName = "Mapbox/Modifiers/Smooth Line Modifier")]
+	[Serializable]
     public class SmoothLineModifier : MeshModifier
     {
-        public override ModifierType Type { get { return ModifierType.Preprocess; } }
+		[Serializable]
+		public struct ModifierSettings
+		{
+			public int MaxEdgeSectionCount;
+			public int PreferredEdgeSectionLength;
 
-        public int _maxEdgeSectionCount = 40;
-        public int _preferredEdgeSectionLength = 10;
+			public static ModifierSettings DefaultSettings
+			{
+				get
+				{
+					return new ModifierSettings
+					{
+						MaxEdgeSectionCount = 40,
+						PreferredEdgeSectionLength = 10,
+					};
+				}
+			}
+		}
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		[SerializeField]
+		ModifierSettings m_Settings = ModifierSettings.DefaultSettings;
+		public ModifierSettings Settings
+		{
+			get { return m_Settings; }
+			set { m_Settings = value; }
+		}
+
+		public override void Reset()
+		{
+			m_Settings = ModifierSettings.DefaultSettings;
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             for (int i = 0; i < feature.Points.Count; i++)
             {
@@ -22,7 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     nl.Add(feature.Points[i][j - 1]);
                     var dist = Vector3.Distance(feature.Points[i][j - 1], feature.Points[i][j]);
-                    var step = Math.Min(_maxEdgeSectionCount, dist / _preferredEdgeSectionLength);
+                    var step = Math.Min(Settings.MaxEdgeSectionCount, dist / Settings.PreferredEdgeSectionLength);
                     if (step > 1)
                     {
                         var counter = 1;
