@@ -3,139 +3,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
-
-	public enum ExtrusionType
-	{
-		Wall,
-		FirstMidFloor,
-		FirstMidTopFloor
-	}
+	using System;
+	using System.Linq;
+	using Mapbox.VectorTile.Geometry.InteralClipperLib;
 
 	/// <summary>
-	/// Height Modifier is responsible for the y axis placement of the feature. It pushes the original vertices upwards by "height" value and creates side walls around that new polygon down to "min_height" value.
-	/// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data. 
-	/// Height Modifier also creates a continuous UV mapping for side walls.
+	/// Chamfer modifiers adds an extra vertex and a line segmet at each corner, making corners and line smoother.
+	/// Generally used for smoother building meshes and should be used before Polygon Mesh Modifier.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
-	public class HeightModifier : MeshModifier
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/New Chamfer Modifier 1")]
+	public class NewChamferModifier1 : MeshModifier
 	{
-		[SerializeField]
-		private bool _flatTops;
-		[SerializeField]
-		private float _height;
-		[SerializeField]
-		private bool _forceHeight;
 		[SerializeField]
 		private float _offset;
 
-		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
-				return;
-
-			var count = md.Vertices.Count;
-			Chamfer(feature, md, tile);
-
-			var minHeight = 0f;
-			float hf = _height;
-			if (!_forceHeight)
-			{
-				if (feature.Properties.ContainsKey("height"))
-				{
-					if (float.TryParse(feature.Properties["height"].ToString(), out hf))
-					{
-						if (feature.Properties.ContainsKey("min_height"))
-						{
-							minHeight = float.Parse(feature.Properties["min_height"].ToString());
-							hf -= minHeight;
-						}
-					}
-				}
-				if (feature.Properties.ContainsKey("ele"))
-				{
-					if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
-					{
-					}
-				}
-			}
-
-			var max = md.Vertices[0].y;
-			var min = md.Vertices[0].y;
-			if (_flatTops)
-			{
-				for (int i = 0; i < md.Vertices.Count; i++)
-				{
-					if (md.Vertices[i].y > max)
-						max = md.Vertices[i].y;
-					else if (md.Vertices[i].y < min)
-						min = md.Vertices[i].y;
-				}
-				for (int i = 0; i < md.Vertices.Count; i++)
-				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, max + minHeight + hf, md.Vertices[i].z);
-				}
-				hf += max - min;
-			}
-			else
-			{
-				for (int i = 0; i < md.Vertices.Count; i++)
-				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
-				}
-			}
-
-			float d = 0f;
-			Vector3 v1;
-			Vector3 v2 = Vector3.zero;
-			int ind = 0;
-
-			var wallTri = new List<int>();
-			var wallUv = new List<Vector2>();
-			md.Vertices.Add(new Vector3(md.Vertices[count - 1].x, md.Vertices[count - 1].y - hf, md.Vertices[count - 1].z));
-			wallUv.Add(new Vector2(0, -hf));
-			md.Normals.Add(md.Normals[count - 1]);
-
-			var start = md.Edges[0];
-
-			for (int i = 0; i < md.Edges.Count; i += 2)
-			{
-				v1 = md.Vertices[md.Edges[i]];
-				v2 = md.Vertices[md.Edges[i + 1]];
-				ind = md.Vertices.Count;
-				md.Vertices.Add(v1);
-				md.Vertices.Add(v2);
-				md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-				md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
-
-				md.Normals.Add(md.Normals[md.Edges[i]]);
-				md.Normals.Add(md.Normals[md.Edges[i+1]]);
-				md.Normals.Add(md.Normals[md.Edges[i]]);
-				md.Normals.Add(md.Normals[md.Edges[i + 1]]);
-
-				d = (v2 - v1).magnitude;
-
-				wallUv.Add(new Vector2(0, 0));
-				wallUv.Add(new Vector2(d, 0));
-				wallUv.Add(new Vector2(0, -hf));
-				wallUv.Add(new Vector2(d, -hf));
-
-				wallTri.Add(ind);
-				wallTri.Add(ind + 1);
-				wallTri.Add(ind + 2);
-
-				wallTri.Add(ind + 1);
-				wallTri.Add(ind + 3);
-				wallTri.Add(ind + 2);
-			}
-
-			md.Triangles.Add(wallTri);
-			md.UV[0].AddRange(wallUv);
-
-		}
-
-		public void Chamfer(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			if (md.Vertices.Count == 0 || feature.Points.Count > 1)
 				return;
@@ -145,9 +27,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Triangles[0][i] *= 3;
 			}
 
-			md.Normals.Clear();
 			List<Vector3> newVertices = new List<Vector3>();
-			List<Vector2> newUV = new List<Vector2>();
 			int num_points = md.Vertices.Count - 1;
 			for (int j = 0; j < num_points; j++)
 			{
@@ -198,13 +78,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				newVertices.Add(poi + new Vector3(0, _offset / 2, 0));
 				newVertices.Add(md.Vertices[j] + v1);
 				newVertices.Add(md.Vertices[j] - v2);
-				md.Normals.Add(Constants.Math.Vector3Up);
-				md.Normals.Add(-n1);
-				md.Normals.Add(-n2);
-				newUV.Add(md.UV[0][j]);
-				newUV.Add(md.UV[0][j]);
-				newUV.Add(md.UV[0][j]);
-
 
 				md.Triangles[0].Add(3 * j);
 				md.Triangles[0].Add(3 * j + 1);
@@ -233,12 +106,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			md.Vertices = newVertices;
-			md.UV[0] = newUV;
 			md.Edges.Clear();
-			for (int i = 0; i < md.Vertices.Count; i += 3)
+			for (int i = 0; i < md.Vertices.Count; i+=3)
 			{
 				md.Edges.Add((i + 2) % md.Vertices.Count);
-				md.Edges.Add(i + 1);
+				md.Edges.Add(i+1);
 
 				md.Edges.Add((i + 4) % md.Vertices.Count);
 				md.Edges.Add((i + 2) % md.Vertices.Count);
