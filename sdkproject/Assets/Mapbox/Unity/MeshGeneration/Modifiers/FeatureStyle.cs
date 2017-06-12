@@ -15,23 +15,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     {
 		public List<ModifierBase> MeshModifiers = new List<ModifierBase>();
 
-		public SmoothLineModifier SmoothLineModifier = new SmoothLineModifier();
-		public SnapTerrainModifier SnapTerrainModifier = new SnapTerrainModifier();
-		public PolygonMeshModifier PolygonMeshModifier = new PolygonMeshModifier();
-		public UvModifier UvModifier = new UvModifier();
-		public HeightModifier HeightModifier = new HeightModifier();
+		//public SmoothLineModifier SmoothLineModifier = new SmoothLineModifier();
+		//public SnapTerrainModifier SnapTerrainModifier = new SnapTerrainModifier();
+		//public PolygonMeshModifier PolygonMeshModifier = new PolygonMeshModifier();
+		//public UvModifier UvModifier = new UvModifier();
+		//public HeightModifier HeightModifier = new HeightModifier();
 
 		public void OnEnable()
 		{
-			//MeshModifiers = new List<ModifierBase>();
-			//MeshModifiers.Add(new SmoothLineModifier());
-			//MeshModifiers.Add(new SnapTerrainModifier());
-			//MeshModifiers.Add(new PolygonMeshModifier());
-			//MeshModifiers.Add(new UvModifier());
-			//MeshModifiers.Add(new HeightModifier());
-			//MeshModifiers.Add(new TextureModifier());
-			//MeshModifiers.Add(new ColliderModifier());
-			//MeshModifiers.Add(new LayerModifier());
+			MeshModifiers = new List<ModifierBase>();
+			MeshModifiers.Add(new SmoothLineModifier());
+			MeshModifiers.Add(new SnapTerrainModifier());
+			MeshModifiers.Add(new PolygonMeshModifier());
+			MeshModifiers.Add(new UvModifier());
+			MeshModifiers.Add(new HeightModifier());
+			MeshModifiers.Add(new TextureModifier());
+			MeshModifiers.Add(new ColliderModifier());
+			MeshModifiers.Add(new LayerModifier());
 		}
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")

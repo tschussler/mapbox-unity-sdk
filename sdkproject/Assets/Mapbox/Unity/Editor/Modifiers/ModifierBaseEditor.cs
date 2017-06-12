@@ -21,8 +21,9 @@ public class ModifierBaseEditor
 
 	internal void OnPreEnable()
 	{
-		m_SettingsProperty = serializedProperty.FindPropertyRelative("m_Settings");
-		m_EnabledProperty = serializedProperty.FindPropertyRelative("m_Enabled");
+		var ob = new SerializedObject(target);
+		m_SettingsProperty = ob.FindProperty("m_Settings");
+		m_EnabledProperty = ob.FindProperty("m_Enabled");
 
 		OnEnable();
 	}

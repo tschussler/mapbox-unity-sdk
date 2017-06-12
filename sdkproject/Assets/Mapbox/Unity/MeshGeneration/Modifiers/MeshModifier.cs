@@ -1,13 +1,15 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
     using Mapbox.Unity.MeshGeneration.Data;
-    
-    public enum ModifierType
+	using System;
+
+	public enum ModifierType
     {
         Preprocess,
         Postprocess
     }
 
+	[Serializable]
     public class MeshModifier : ModifierBase
     {
         public virtual ModifierType Type { get { return ModifierType.Preprocess; } }
