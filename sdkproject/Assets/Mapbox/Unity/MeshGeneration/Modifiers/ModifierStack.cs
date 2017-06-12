@@ -23,7 +23,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 mod.Run(feature, meshData, tile);
             }
 
-            var go = CreateGameObject(meshData, parent);
+            var go = CreateGameObject(feature, meshData, parent);
             go.name = type + " - " + feature.Data.Id;
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(feature);
@@ -36,7 +36,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             return go;
         }
 
-        private GameObject CreateGameObject(MeshData data, GameObject main)
+        private GameObject CreateGameObject(VectorFeatureUnity feature, MeshData data, GameObject main)
         {
             var go = new GameObject();
             var mesh = go.AddComponent<MeshFilter>().mesh;
@@ -46,6 +46,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             for (int i = 0; i < data.Triangles.Count; i++)
             {
                 var triangle = data.Triangles[i];
+				//if (data.Triangles[i].Any(x => x >= data.Vertices.Count))
+				//	Debug.Log("here");
                 mesh.SetTriangles(triangle, i);
             }
 
@@ -55,7 +57,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 mesh.SetUVs(i, uv);
             }
 
-            mesh.RecalculateNormals();
+			mesh.SetNormals(data.Normals);
+
+            //mesh.RecalculateNormals();
             go.transform.SetParent(main.transform, false);
 
             return go;
