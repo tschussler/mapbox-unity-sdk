@@ -85,6 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             float d = 0f;
             Vector3 v1;
             Vector3 v2;
+			Vector3 norm;
             int ind = 0;
 
             var wallTri = new List<int>();
@@ -100,7 +101,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
                 md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
 
-                d = (v2 - v1).magnitude;
+				norm = new Vector3(-(v1.z - v2.z), 0, v1.x - v2.x);
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+
+				d = (v2 - v1).magnitude;
 
                 wallUv.Add(new Vector2(0, 0));
                 wallUv.Add(new Vector2(d, 0));

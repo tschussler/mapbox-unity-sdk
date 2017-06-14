@@ -43,6 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             mesh.subMeshCount = data.Triangles.Count;
 
             mesh.SetVertices(data.Vertices);
+			mesh.SetNormals(data.Normals);
             for (int i = 0; i < data.Triangles.Count; i++)
             {
                 var triangle = data.Triangles[i];
@@ -54,9 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 var uv = data.UV[i];
                 mesh.SetUVs(i, uv);
             }
-
-            mesh.RecalculateNormals();
-            go.transform.SetParent(main.transform, false);
+			go.transform.SetParent(main.transform, false);
 
             return go;
         }

@@ -16,6 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public List<Vector3> Normals { get; set; }
 		public List<List<int>> Triangles { get; set; }
 		public List<List<Vector2>> UV { get; set; }
+		public List<int[]> PointEdges;
 
 		public MeshData()
 		{
@@ -25,6 +26,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Triangles = new List<List<int>>();
 			UV = new List<List<Vector2>>();
 			UV.Add(new List<Vector2>());
+			PointEdges = new List<int[]>();
 		}
 	}
 }
