@@ -35,54 +35,33 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
-			var count = md.Vertices.Count;
+			var originalVertexCount = md.Vertices.Count;
 			Chamfer(feature, md, tile);
 
+			Sides(feature, md, originalVertexCount);
+		}
+
+		private void Sides(VectorFeatureUnity feature, MeshData meshData, int originalVertexCount)
+		{
 			var minHeight = 0f;
 			float hf = _height;
+			
 			if (!_forceHeight)
 			{
-				if (feature.Properties.ContainsKey("height"))
-				{
-					if (float.TryParse(feature.Properties["height"].ToString(), out hf))
-					{
-						if (feature.Properties.ContainsKey("min_height"))
-						{
-							minHeight = float.Parse(feature.Properties["min_height"].ToString());
-							hf -= minHeight;
-						}
-					}
-				}
-				if (feature.Properties.ContainsKey("ele"))
-				{
-					if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
-					{
-					}
-				}
+				GetHeightData(feature, ref minHeight, ref hf);
 			}
 
-			var max = md.Vertices[0].y;
-			var min = md.Vertices[0].y;
+			var max = meshData.Vertices[0].y;
+			var min = meshData.Vertices[0].y;
 			if (_flatTops)
 			{
-				for (int i = 0; i < md.Vertices.Count; i++)
-				{
-					if (md.Vertices[i].y > max)
-						max = md.Vertices[i].y;
-					else if (md.Vertices[i].y < min)
-						min = md.Vertices[i].y;
-				}
-				for (int i = 0; i < md.Vertices.Count; i++)
-				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, max + minHeight + hf, md.Vertices[i].z);
-				}
-				hf += max - min;
+				FlattenTops(meshData, minHeight, ref hf, ref max, ref min);
 			}
 			else
 			{
-				for (int i = 0; i < md.Vertices.Count; i++)
+				for (int i = 0; i < meshData.Vertices.Count; i++)
 				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
+					meshData.Vertices[i] = new Vector3(meshData.Vertices[i].x, meshData.Vertices[i].y + minHeight + hf, meshData.Vertices[i].z);
 				}
 			}
 
@@ -93,26 +72,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			var wallTri = new List<int>();
 			var wallUv = new List<Vector2>();
-			md.Vertices.Add(new Vector3(md.Vertices[count - 1].x, md.Vertices[count - 1].y - hf, md.Vertices[count - 1].z));
+			meshData.Vertices.Add(new Vector3(meshData.Vertices[originalVertexCount - 1].x, meshData.Vertices[originalVertexCount - 1].y - hf, meshData.Vertices[originalVertexCount - 1].z));
 			wallUv.Add(new Vector2(0, -hf));
-			md.Normals.Add(md.Normals[count - 1]);
+			meshData.Normals.Add(meshData.Normals[originalVertexCount - 1]);
 
-			var start = md.Edges[0];
-
-			for (int i = 0; i < md.Edges.Count; i += 2)
+			for (int i = 0; i < meshData.Edges.Count; i += 2)
 			{
-				v1 = md.Vertices[md.Edges[i]];
-				v2 = md.Vertices[md.Edges[i + 1]];
-				ind = md.Vertices.Count;
-				md.Vertices.Add(v1);
-				md.Vertices.Add(v2);
-				md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-				md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+				v1 = meshData.Vertices[meshData.Edges[i]];
+				v2 = meshData.Vertices[meshData.Edges[i + 1]];
+				ind = meshData.Vertices.Count;
+				meshData.Vertices.Add(v1);
+				meshData.Vertices.Add(v2);
+				meshData.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
+				meshData.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
 
-				md.Normals.Add(md.Normals[md.Edges[i]]);
-				md.Normals.Add(md.Normals[md.Edges[i+1]]);
-				md.Normals.Add(md.Normals[md.Edges[i]]);
-				md.Normals.Add(md.Normals[md.Edges[i + 1]]);
+				meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
+				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
+				meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
+				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
 
 				d = (v2 - v1).magnitude;
 
@@ -130,61 +107,110 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				wallTri.Add(ind + 2);
 			}
 
-			md.Triangles.Add(wallTri);
-			md.UV[0].AddRange(wallUv);
+			meshData.Triangles.Add(wallTri);
+			meshData.UV[0].AddRange(wallUv);
+		}
 
+		private static void FlattenTops(MeshData meshData, float minHeight, ref float hf, ref float max, ref float min)
+		{
+			for (int i = 0; i < meshData.Vertices.Count; i++)
+			{
+				if (meshData.Vertices[i].y > max)
+					max = meshData.Vertices[i].y;
+				else if (meshData.Vertices[i].y < min)
+					min = meshData.Vertices[i].y;
+			}
+			for (int i = 0; i < meshData.Vertices.Count; i++)
+			{
+				meshData.Vertices[i] = new Vector3(meshData.Vertices[i].x, max + minHeight + hf, meshData.Vertices[i].z);
+			}
+			hf += max - min;
+		}
+
+		private static void GetHeightData(VectorFeatureUnity feature, ref float minHeight, ref float hf)
+		{
+			if (feature.Properties.ContainsKey("height"))
+			{
+				if (float.TryParse(feature.Properties["height"].ToString(), out hf))
+				{
+					if (feature.Properties.ContainsKey("min_height"))
+					{
+						minHeight = float.Parse(feature.Properties["min_height"].ToString());
+						hf -= minHeight;
+					}
+				}
+			}
+			if (feature.Properties.ContainsKey("ele"))
+			{
+				if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
+				{
+				}
+			}
 		}
 
 		public void Chamfer(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			if (md.Vertices.Count == 0 || feature.Points.Count > 1)
+			if (md.Vertices.Count == 0 || feature.Points.Count < 1)
 				return;
 
-			for (int i = 0; i < md.Triangles[0].Count; i++)
-			{
-				md.Triangles[0][i] *= 3;
-			}
-
-			md.Normals.Clear();
 			List<Vector3> newVertices = new List<Vector3>();
 			List<Vector2> newUV = new List<Vector2>();
-			int num_points = md.Vertices.Count - 1;
-			for (int j = 0; j < num_points; j++)
-			{
-				// Find the new location for point j.
-				// Find the points before and after j.
-				int i = (j - 1);
-				if (i < 0) i += num_points;
-				int k = (j + 1) % num_points;
 
-				// Move the points by the offset.
-				Vector3 v1 = new Vector3(
-					md.Vertices[j].x - md.Vertices[i].x, 0,
-					md.Vertices[j].z - md.Vertices[i].z);
+			for (int t = 0; t < md.Triangles[0].Count; t++)
+			{
+				md.Triangles[0][t] *= 3;
+			}
+
+			var i = 0; var j = 0; var k = 0;
+			Vector3 v1, v2, n1,n2,pij1, pij2, pjk1, pjk2;
+			Vector3 poi, close1, close2;
+			for (int e = 0; e < md.PointEdges.Count; e++)
+			{
+				if (md.PointEdges[e][0] == -1)
+				{
+					newVertices.Add(Vector3.zero);
+					newVertices.Add(Vector3.zero);
+					newVertices.Add(Vector3.zero);
+					newUV.Add(new Vector2(0, 0));
+					newUV.Add(new Vector2(0, 0));
+					newUV.Add(new Vector2(0, 0));
+					md.Normals.Add(Constants.Math.Vector3Up);
+					md.Normals.Add(Constants.Math.Vector3Up);
+					md.Normals.Add(Constants.Math.Vector3Up);
+					continue;
+				}
+
+				j = e;
+				k = md.PointEdges[e][0];
+				i = md.PointEdges[e][1];
+
+				v1 = new Vector3(
+						md.Vertices[j].x - md.Vertices[i].x, 0,
+						md.Vertices[j].z - md.Vertices[i].z);
 				v1.Normalize();
 				v1 *= -_offset;
-				Vector3 n1 = new Vector3(-v1.z, 0, v1.x);
+				n1 = new Vector3(-v1.z, 0, v1.x);
 
-				Vector3 pij1 = new Vector3(
+				pij1 = new Vector3(
 					(float)(md.Vertices[i].x + n1.x), 0,
 					(float)(md.Vertices[i].z + n1.z));
-				Vector3 pij2 = new Vector3(
+				pij2 = new Vector3(
 					(float)(md.Vertices[j].x + n1.x), 0,
 					(float)(md.Vertices[j].z + n1.z));
 
-				Vector3 v2 = new Vector3(
+				v2 = new Vector3(
 					md.Vertices[k].x - md.Vertices[j].x, 0,
 					md.Vertices[k].z - md.Vertices[j].z);
 
-				Vector3 poi, close1, close2;
+				
 
 				v2.Normalize();
 				v2 *= -_offset;
-				Vector3 n2 = new Vector3(-v2.z, 0, v2.x);
-				Vector3 pjk1 = new Vector3(
+				n2 = new Vector3(-v2.z, 0, v2.x);
+				pjk1 = new Vector3(
 					(float)(md.Vertices[j].x + n2.x), 0,
 					(float)(md.Vertices[j].z + n2.z));
-				Vector3 pjk2 = new Vector3(
+				pjk2 = new Vector3(
 					(float)(md.Vertices[k].x + n2.x), 0,
 					(float)(md.Vertices[k].z + n2.z));
 
@@ -205,44 +231,27 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				newUV.Add(md.UV[0][j]);
 				newUV.Add(md.UV[0][j]);
 
-
 				md.Triangles[0].Add(3 * j);
 				md.Triangles[0].Add(3 * j + 1);
 				md.Triangles[0].Add(3 * j + 2);
 
-				if (j != 0)
-				{
-					md.Triangles[0].Add(3 * j);
-					md.Triangles[0].Add(3 * j - 3);
-					md.Triangles[0].Add(3 * j - 1);
+				md.Edges.Add(3 * j + 2);
+				md.Edges.Add(3 * j + 1);
 
-					md.Triangles[0].Add(3 * j);
-					md.Triangles[0].Add(3 * j - 1);
-					md.Triangles[0].Add(3 * j + 1);
-				}
-				else
-				{
-					md.Triangles[0].Add(0);
-					md.Triangles[0].Add(3 * num_points - 3);
-					md.Triangles[0].Add(3 * num_points - 1);
+				md.Triangles[0].Add(3 * k);
+				md.Triangles[0].Add(3 * j + 2);
+				md.Triangles[0].Add(3 * k + 1);
 
-					md.Triangles[0].Add(0);
-					md.Triangles[0].Add(3 * num_points - 1);
-					md.Triangles[0].Add(1);
-				}
+				md.Triangles[0].Add(3 * j);
+				md.Triangles[0].Add(3 * j + 2);
+				md.Triangles[0].Add(3 * k);
+				//Debug.Log(i + " - " + j + " - " + k);
+				md.Edges.Add(3 * k + 1);
+				md.Edges.Add(3 * j + 2);
 			}
 
 			md.Vertices = newVertices;
 			md.UV[0] = newUV;
-			md.Edges.Clear();
-			for (int i = 0; i < md.Vertices.Count; i += 3)
-			{
-				md.Edges.Add((i + 2) % md.Vertices.Count);
-				md.Edges.Add(i + 1);
-
-				md.Edges.Add((i + 4) % md.Vertices.Count);
-				md.Edges.Add((i + 2) % md.Vertices.Count);
-			}
 		}
 
 		private List<Vector3> GetEnlargedPolygon(List<Vector3> old_points, float offset)

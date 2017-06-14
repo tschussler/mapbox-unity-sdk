@@ -48,7 +48,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 var triangle = data.Triangles[i];
 				//if (data.Triangles[i].Any(x => x >= data.Vertices.Count))
 				//	Debug.Log("here");
-                mesh.SetTriangles(triangle, i);
+				mesh.SetTriangles(triangle, i);
             }
 
             for (int i = 0; i < data.UV.Count; i++)

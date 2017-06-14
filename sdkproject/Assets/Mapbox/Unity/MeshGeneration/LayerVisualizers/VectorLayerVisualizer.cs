@@ -83,6 +83,25 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                     }
                 }
 
+				//feature.Points.Clear();
+				//feature.Points.Add(new List<Vector3>()
+				//{
+				//	new Vector3(1,0,0),
+				//	new Vector3(0,0,50),
+				//	new Vector3(50,0,50),
+				//	new Vector3(50,0,0),
+				//	new Vector3(1,0,0)
+				//});
+
+				//feature.Points.Add(new List<Vector3>()
+				//{
+				//	new Vector3(15,0,15),
+				//	new Vector3(35,0,15),
+				//	new Vector3(35,0,35),
+				//	new Vector3(15,0,35),
+				//	new Vector3(15,0,15),
+				//});
+
                 if (!filterOut)
                     Build(feature, tile, _container);
             }
