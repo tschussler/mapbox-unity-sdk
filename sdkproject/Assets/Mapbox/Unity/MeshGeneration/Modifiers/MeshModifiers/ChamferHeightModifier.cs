@@ -144,6 +144,7 @@
 			List<Vector3> newVertices = new List<Vector3>();
 			List<Vector2> newUV = new List<Vector2>();
 			md.Normals.Clear();
+			md.Edges.Clear();
 
 			for (int t = 0; t < md.Triangles[0].Count; t++)
 			{
